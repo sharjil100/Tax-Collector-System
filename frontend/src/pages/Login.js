@@ -1,12 +1,14 @@
 import React, { useState } from "react";
 import axios from "axios";
-import { Link } from "react-router-dom";
+import { Link, useNavigate } from "react-router-dom";
 import './Auth.css';
+import Cookies from "js-cookie";
 
 const Login = () => {
     const [email, setEmail] = useState("");
     const [password, setPassword] = useState("");
     const [error, setError] = useState("");
+    const navigate = useNavigate();
 
     const handleSubmit = async (e) => {
         e.preventDefault();
@@ -14,7 +16,9 @@ const Login = () => {
             const res = await axios.post("http://localhost:5000/api/auth/login", { email, password });
 
             console.log(res.data);
+            Cookies.set("token", res.data.token, { expires: 1 });
             alert("Logged in successfully");
+            navigate("/dashboard");
         } catch (error) {
             console.error(error);
             setError("Error logging in");
