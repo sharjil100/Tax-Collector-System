@@ -3,6 +3,7 @@ import { BrowserRouter as Router, Routes, Route, Navigate } from "react-router-d
 import Signup from "./pages/Signup";
 import Login from "./pages/Login";
 import Dashboard from "./pages/Dashboard"; // Ensure to import Dashboard
+import TaxFilingForm from "./pages/TaxFilingForm";
 
 function App() {
   return (
@@ -16,6 +17,7 @@ function App() {
           <Route path="/login" element={<Login />} />
           <Route path="/signup" element={<Signup />} />
           <Route path="/dashboard" element={<Dashboard />} /> {/* Close the Dashboard Route properly */}
+          <Route path="/file-tax" element={<TaxFilingForm />} />
 
           {/* Optionally, add a route to handle undefined paths */}
           <Route path="*" element={<h1>Page Not Found</h1>} />
