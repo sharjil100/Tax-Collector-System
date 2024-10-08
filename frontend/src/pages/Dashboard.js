@@ -1,46 +1,52 @@
 import React, { useEffect, useState } from "react";
 import axios from "axios";
 import { Link } from "react-router-dom";
-import Cookies from "js-cookie"; // Import js-cookie
-import Logout from "./Logout"; // Import the Logout component
+import Cookies from "js-cookie";
+import Logout from "./Logout";
 import Login from "./Login";
 import "./Dashboard.css";
 
 const Dashboard = () => {
-
-  
   const [userData, setUserData] = useState(null);
   const [taxDues, setTaxDues] = useState([]);
   const [paymentHistory, setPaymentHistory] = useState([]);
   const [notifications, setNotifications] = useState([]);
 
+  const token = Cookies.get("token");
 
   useEffect(() => {
     // Fetch user data, tax dues, payment history, and notifications
     const fetchData = async () => {
       try {
-        const userRes = await axios.get("http://localhost:5000/api/user");
+        // Set the Authorization header with the token for each request
+        const config = {
+          headers: {
+            Authorization: `Bearer ${token}`,
+          },
+        };
+
+        const userRes = await axios.get("http://localhost:5000/api/user", config);
         setUserData(userRes.data);
 
-        const duesRes = await axios.get("http://localhost:5000/api/tax/dues");
+        const duesRes = await axios.get("http://localhost:5000/api/tax/dues", config);
         setTaxDues(duesRes.data);
 
-        const paymentsRes = await axios.get("http://localhost:5000/api/tax/payments");
+        const paymentsRes = await axios.get("http://localhost:5000/api/tax/payments", config);
         setPaymentHistory(paymentsRes.data);
 
-        const notificationsRes = await axios.get("http://localhost:5000/api/notifications");
+        const notificationsRes = await axios.get("http://localhost:5000/api/notifications", config);
         setNotifications(notificationsRes.data);
       } catch (error) {
         console.error("Error fetching dashboard data", error);
       }
     };
 
-    fetchData();
-  }, []);
-
-  const token = Cookies.get("token");
-
-
+    if (token) {
+      fetchData();
+    } else {
+      console.error("No token found, user not authenticated.");
+    }
+  }, [token]);
 
   return (
     <div className="dashboard-container">
