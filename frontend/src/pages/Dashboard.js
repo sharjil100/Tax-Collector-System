@@ -2,8 +2,6 @@ import React, { useEffect, useState } from "react";
 import axios from "axios";
 import { Link } from "react-router-dom";
 import Cookies from "js-cookie";
-import Logout from "./Logout";
-import Login from "./Login";
 import "./Dashboard.css";
 
 const Dashboard = () => {
@@ -110,6 +108,7 @@ const Dashboard = () => {
         <Link to="/file-tax" className="button">File Your Tax</Link>
         <Link to="/payment" className="button">Make a Payment</Link>
         <Link to="/tax-history" className="button">View Tax History</Link>
+        <Link to="/logout" className="button">Logout<i class="fa fa-sign-out" aria-hidden="true"></i></Link>
       </div>
     </div>
   );

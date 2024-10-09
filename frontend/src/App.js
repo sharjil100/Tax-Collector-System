@@ -4,6 +4,7 @@ import Signup from "./pages/Signup";
 import Login from "./pages/Login";
 import Dashboard from "./pages/Dashboard"; // Ensure to import Dashboard
 import TaxFilingForm from "./pages/TaxFilingForm";
+import Logout from "./pages/Logout";
 
 function App() {
   return (
@@ -18,6 +19,7 @@ function App() {
           <Route path="/signup" element={<Signup />} />
           <Route path="/dashboard" element={<Dashboard />} /> {/* Close the Dashboard Route properly */}
           <Route path="/file-tax" element={<TaxFilingForm />} />
+          <Route path="/logout" element={<Logout />} />
 
           {/* Optionally, add a route to handle undefined paths */}
           <Route path="*" element={<h1>Page Not Found</h1>} />
