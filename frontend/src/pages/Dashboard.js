@@ -1,6 +1,6 @@
 import React, { useEffect, useState } from "react";
 import axios from "axios";
-import { Link } from "react-router-dom";
+import { Link, useNavigate } from "react-router-dom";
 import Cookies from "js-cookie";
 import "./Dashboard.css";
 
@@ -10,13 +10,19 @@ const Dashboard = () => {
   const [paymentHistory, setPaymentHistory] = useState([]);
   const [notifications, setNotifications] = useState([]);
 
+  const navigate = useNavigate(); // Initialize the navigate hook
   const token = Cookies.get("token");
 
   useEffect(() => {
+    if (!token) {
+      // Redirect to login page if no token found
+      navigate("/login");
+      return; // Prevent further execution
+    }
+
     // Fetch user data, tax dues, payment history, and notifications
     const fetchData = async () => {
       try {
-        // Set the Authorization header with the token for each request
         const config = {
           headers: {
             Authorization: `Bearer ${token}`,
@@ -39,12 +45,8 @@ const Dashboard = () => {
       }
     };
 
-    if (token) {
-      fetchData();
-    } else {
-      console.error("No token found, user not authenticated.");
-    }
-  }, [token]);
+    fetchData();
+  }, [token, navigate]); // Add navigate to dependencies
 
   return (
     <div className="dashboard-container">
@@ -108,7 +110,7 @@ const Dashboard = () => {
         <Link to="/file-tax" className="button">File Your Tax</Link>
         <Link to="/payment" className="button">Make a Payment</Link>
         <Link to="/tax-history" className="button">View Tax History</Link>
-        <Link to="/logout" className="button">Logout<i class="fa fa-sign-out" aria-hidden="true"></i></Link>
+        <Link to="/logout" className="button">Logout<i className="fa fa-sign-out" aria-hidden="true"></i></Link>
       </div>
     </div>
   );
