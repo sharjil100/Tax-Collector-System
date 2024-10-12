@@ -1,23 +1,31 @@
-const User = require("../models/user.model");
-const jwt = require("jsonwebtoken");
+// controllers/user.controller.js
+const User = require('../models/user.model');
+const bcrypt = require('bcrypt');
+const jwt = require('jsonwebtoken');
 
-exports.getUserData = async (req, res) => {
-    try {
-        // Get token from authorization header
-        const token = req.headers.authorization.split(" ")[1]; // Assuming "Bearer token"
-        const decoded = jwt.verify(token, process.env.JWT_SECRET);
-        
-        // Find user by ID from the token
-        const user = await User.findById(decoded.userId);
-        
-        if (!user) {
-            return res.status(404).json({ message: "User not found" });
-        }
+const registerUser = async (req, res) => {
+  const { name, email, password, userType } = req.body;
+  const hashedPassword = await bcrypt.hash(password, 10);
+  
+  const user = new User({ name, email, password: hashedPassword, userType });
+  await user.save();
 
-        // Exclude password from response
-        const { password, ...userData } = user._doc;
-        res.json(userData);
-    } catch (error) {
-        res.status(500).json({ message: "Server error" });
-    }
+  res.status(201).json({ message: 'User registered successfully!' });
 };
+
+const loginUser = async (req, res) => {
+  const { email, password } = req.body;
+  const user = await User.findOne({ email });
+
+  if (!user || !(await bcrypt.compare(password, user.password))) {
+    return res.status(400).json({ message: 'Invalid credentials.' });
+  }
+
+  const token = jwt.sign({ id: user._id }, process.env.JWT_SECRET, { expiresIn: '1h' });
+  res.json({ token });
+};
+
+console.log('registerUser defined:', !!registerUser);
+console.log('loginUser defined:', !!loginUser)
+
+module.exports = { registerUser, loginUser };
