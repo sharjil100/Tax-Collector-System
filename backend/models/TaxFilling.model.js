@@ -9,5 +9,5 @@ const taxfillingSchema = new mongoose.Schema({
     createdAt: { type: Date, default: Date.now }
   });
   
-  module.exports = mongoose.model('taxfilling', taxfillingSchema);
+  module.exports = mongoose.model('TaxFilling', taxfillingSchema);
   

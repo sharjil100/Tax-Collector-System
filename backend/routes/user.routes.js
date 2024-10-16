@@ -1,12 +1,24 @@
-const express = require('express');
-const { registerUser, loginUser } = require('../controllers/user.controller');
+const express = require("express");
+const { authenticate } = require("../middleware/auth.middleware"); // Adjust the path as necessary
+const {
+    registerUser,
+    loginUser,
+    updateUserProfile,
+    getUserProfile,
+} = require("../controllers/user.controller"); // Adjust the path as necessary
 
 const router = express.Router();
 
-console.log('registerUser:', registerUser); // Debugging log
-console.log('loginUser:', loginUser); // Debugging log
+// User registration (optional if handled in auth)
+router.post("/register", registerUser);
 
-router.post('/register', registerUser);
-router.post('/login', loginUser);
+// User login (optional if handled in auth)
+router.post("/login", loginUser);
+
+// Update user profile
+router.put("/", authenticate, updateUserProfile);
+
+// Get user profile
+router.get("/", authenticate, getUserProfile);
 
 module.exports = router;

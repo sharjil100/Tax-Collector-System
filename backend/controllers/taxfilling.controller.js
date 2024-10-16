@@ -1,11 +1,11 @@
-// controllers/taxfilling.controller.js
+
 const TaxFilling = require('../models/TaxFilling.model');
 const User = require('../models/user.model');
 
 const createtaxfilling = async (req, res) => {
   const { taxYear, income, deductions } = req.body;
 
-  // Simple tax calculation logic (modify as needed)
+  
   const calculatedTax = (income - deductions) * 0.2; // 20% tax rate
 
   const newTaxFilling = new TaxFilling({

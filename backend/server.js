@@ -6,7 +6,7 @@ const paymentRoutes = require("./routes/payment.routes");
 const notificationRoutes = require("./routes/notification.routes");
 const taxRoutes = require("./routes/taxfilling.routes");
 const documentRoutes = require("./routes/document.routes");
-const testRoutes = require("./routes/test.routes"); // Include test routes
+const testRoutes = require("./routes/test.routes"); 
 const cors = require("cors");
 require("dotenv").config();
 
@@ -16,14 +16,14 @@ connectDB();
 app.use(cors());
 app.use(express.json());
 
-// Routes
+
 app.use("/api/auth", authRoutes);
-app.use("/api/user", userRoutes);
+app.use("/api/users", userRoutes);
 app.use("/api/taxfilling", taxRoutes);
 app.use("/api/payments", paymentRoutes);
 app.use("/api/notifications", notificationRoutes);
 app.use("/api/documents", documentRoutes);
-app.use("/api", testRoutes); // Include test routes
+app.use("/api", testRoutes); 
 
 const PORT = process.env.PORT || 5000;
 app.listen(PORT, () => {

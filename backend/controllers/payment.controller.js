@@ -1,22 +1,42 @@
-// controllers/payment.controller.js
 const Payment = require('../models/Payment.model');
-const taxfilling = require('../models/TaxFilling.model');
+const TaxFiling = require('../models/TaxFilling.model');
 
 const makePayment = async (req, res) => {
-  const { taxfillingId, amountPaid, paymentMethod } = req.body;
+  
+  console.log('Received payment request:', req.body);
+  
+  const { taxFilingId, amountPaid, paymentMethod } = req.body;
 
-  const taxfilling = await taxfilling.findById(taxfillingId);
-  if (!taxfilling) return res.status(404).json({ message: 'Tax filing not found.' });
+  
+  if (!taxFilingId || !amountPaid || !paymentMethod) {
+    console.error('Missing required fields:', { taxFilingId, amountPaid, paymentMethod });
+    return res.status(400).json({ message: 'Missing required fields.' });
+  }
 
-  const payment = new Payment({
-    userId: req.user._id,
-    taxfillingId,
-    amountPaid,
-    paymentMethod,
-  });
+  try {
+    
+    console.log('User ID from request:', req.user.id);
 
-  await payment.save();
-  res.status(201).json(payment);
+    const newPayment = new Payment({
+      userId: req.user.id, 
+      taxFilingId,         
+      amountPaid,          
+      paymentMethod        
+    });
+
+    
+    await newPayment.save();
+
+    
+    console.log('Payment created successfully:', newPayment);
+
+    
+    res.status(201).json(newPayment);
+  } catch (error) {
+   
+    console.error('Error creating payment:', error); 
+    res.status(400).json({ message: error.message });
+  }
 };
 
 module.exports = { makePayment };

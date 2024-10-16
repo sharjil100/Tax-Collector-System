@@ -1,47 +1,88 @@
-const Auth = require("../models/auth.model");
-const bcrypt = require("bcrypt");
-const jwt = require("jsonwebtoken");
+const Auth = require('../models/auth.model'); // Auth model for authentication
+const User = require('../models/user.model'); // User model for user details
+const bcrypt = require('bcrypt');
+const jwt = require('jsonwebtoken');
 
-// Register a new user
-exports.register = async (req, res) => {
-    const { username, password } = req.body;
+
+const register = async (req, res) => {
+    const { username, password, name, email, userType } = req.body;
 
     try {
+        
+        let existingAuth = await Auth.findOne({ username });
+        if (existingAuth) {
+            return res.status(400).json({ message: 'Username already exists' });
+        }
+
+       
         const hashedPassword = await bcrypt.hash(password, 10);
-        const newUser = new Auth({ username, password: hashedPassword });
+
+        
+        const newAuth = new Auth({
+            username,
+            password: hashedPassword,
+        });
+
+        await newAuth.save();
+
+        
+        const newUser = new User({
+            username,
+            name,
+            email,
+            userType, 
+        });
+
         await newUser.save();
-        res.status(201).json({ message: "User registered successfully!" });
+
+        res.status(201).json({ message: 'User registered successfully' });
+
     } catch (error) {
-        res.status(400).json({ message: "Error registering user", error });
+        console.error('Error during registration:', error);
+        res.status(500).json({ message: 'Server error' });
     }
 };
 
-// Login user
-exports.login = async (req, res) => {
+
+const login = async (req, res) => {
     const { username, password } = req.body;
 
     try {
+        
         const user = await Auth.findOne({ username });
-        if (!user) return res.status(404).json({ message: "User not found!" });
+        if (!user) {
+            return res.status(400).json({ message: 'Invalid username or password' });
+        }
 
+        
         const isMatch = await bcrypt.compare(password, user.password);
-        if (!isMatch) return res.status(401).json({ message: "Invalid credentials" });
+        if (!isMatch) {
+            return res.status(400).json({ message: 'Invalid username or password' });
+        }
 
-        const token = jwt.sign({ id: user._id, role: user.role }, process.env.JWT_SECRET, { expiresIn: '1h' });
+        
+        const token = jwt.sign({ id: user._id }, process.env.JWT_SECRET, { expiresIn: '1h' });
+
         res.status(200).json({ token });
+
     } catch (error) {
-        res.status(400).json({ message: "Error logging in", error });
+        console.error('Error during login:', error);
+        res.status(500).json({ message: 'Server error' });
     }
 };
 
-// Middleware to verify token
-exports.verifyToken = (req, res, next) => {
-    const token = req.headers["authorization"];
-    if (!token) return res.status(403).json({ message: "No token provided" });
 
-    jwt.verify(token, process.env.JWT_SECRET, (err, decoded) => {
-        if (err) return res.status(401).json({ message: "Unauthorized" });
+const verifyToken = (req, res, next) => {
+    const token = req.header('Authorization')?.split(' ')[1];
+    if (!token) return res.status(401).json({ message: 'Access denied. No token provided.' });
+
+    try {
+        const decoded = jwt.verify(token, process.env.JWT_SECRET);
         req.userId = decoded.id;
         next();
-    });
+    } catch (error) {
+        res.status(400).json({ message: 'Invalid token' });
+    }
 };
+
+module.exports = { register, login, verifyToken };

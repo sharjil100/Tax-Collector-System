@@ -1,33 +1,32 @@
 const jwt = require('jsonwebtoken');
-const User = require('../models/user.model');
+const Auth = require('../models/auth.model'); 
+const User = require('../models/user.model'); 
 
 const authenticate = async (req, res, next) => {
-  // Extract the token from the Authorization header
-  const token = req.header('Authorization')?.split(' ')[1]; // Split to get the token only
+    const token = req.header('Authorization')?.split(' ')[1];
+    if (!token) return res.status(401).json({ message: 'Access denied. No token provided.' });
 
-  if (!token) {
-    return res.status(401).json({ message: 'Access denied. No token provided.' });
-  }
-  console.log(token);
+    try {
+        const decoded = jwt.verify(token, process.env.JWT_SECRET);
 
-  try {
-    const decoded = jwt.verify(token, process.env.JWT_SECRET);
-    
-    // Find the user by ID from the decoded token
-    const user = await User.findById(decoded.id);
-    
-    // Check if the user exists
-    if (!user) {
-      return res.status(401).json({ message: 'Invalid token. User not found.' });
+        
+        const authUser = await Auth.findById(decoded.id);
+        if (!authUser) {
+            return res.status(401).json({ message: 'Invalid token. User not found.' });
+        }
+
+        
+        const user = await User.findOne({ username: authUser.username });
+        if (!user) {
+            return res.status(401).json({ message: 'User profile not found.' });
+        }
+
+        req.user = user; 
+        next();
+    } catch (error) {
+        console.error('Token verification error:', error);
+        res.status(400).json({ message: 'Invalid token.' });
     }
-
-    // Attach user info to the request object
-    req.user = user; 
-    next();
-  } catch (error) {
-    console.error('Token verification error:', error); // Log the error for debugging
-    res.status(400).json({ message: 'Invalid token.' });
-  }
 };
 
 module.exports = { authenticate };
