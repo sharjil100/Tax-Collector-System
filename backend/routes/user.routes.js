@@ -9,11 +9,7 @@ const {
 
 const router = express.Router();
 
-// User registration (optional if handled in auth)
-router.post("/register", registerUser);
 
-// User login (optional if handled in auth)
-router.post("/login", loginUser);
 
 // Update user profile
 router.put("/", authenticate, updateUserProfile);

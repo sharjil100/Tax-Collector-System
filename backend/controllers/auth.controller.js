@@ -55,19 +55,22 @@ const register = async (req, res) => {
 
 
 const login = async (req, res) => {
-    const { username, password } = req.body;
+    const { email, password } = req.body;
 
     try {
-        // Find the user by username
+        // Extract the username from the email
+        const username = email.split('@')[0];
+
+        // Find the user by username, not by email
         const user = await Auth.findOne({ username });
         if (!user) {
-            return res.status(400).json({ message: 'Invalid username or password' });
+            return res.status(400).json({ message: 'Invalid email or password' });
         }
 
         // Compare the provided password with the hashed password in the database
         const isMatch = await bcrypt.compare(password, user.password);
         if (!isMatch) {
-            return res.status(400).json({ message: 'Invalid username or password' });
+            return res.status(400).json({ message: 'Invalid email or password' });
         }
 
         // Generate a JWT token
@@ -80,6 +83,7 @@ const login = async (req, res) => {
         res.status(500).json({ message: 'Server error' });
     }
 };
+
 
 const verifyToken = (req, res, next) => {
     const token = req.header('Authorization')?.split(' ')[1];

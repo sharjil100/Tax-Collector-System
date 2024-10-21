@@ -71,8 +71,7 @@ function Footer({ company, links }) {
           <MDTypography variant="button" fontWeight="medium">
             &nbsp;{name}&nbsp;
           </MDTypography>
-        </Link>
-        for a better web.
+        </Link>.
       </MDBox>
       <MDBox
         component="ul"
