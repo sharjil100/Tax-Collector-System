@@ -11,11 +11,13 @@ const AuthSchema = new mongoose.Schema({
         type: String,
         required: true,
     },
-    role: {
-        type: String,
-        enum: ["user", "admin"],
-        default: "user",
+    role: { 
+        type: String, 
+        required: true, 
+        enum: ['individual', 'business'], // Role is either individual or business
+        default: 'individual' 
     },
+    
 }, { timestamps: true });
 
 module.exports = mongoose.model("Auth", AuthSchema);

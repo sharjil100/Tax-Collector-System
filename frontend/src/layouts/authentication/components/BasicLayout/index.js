@@ -33,12 +33,7 @@ function BasicLayout({ image, children }) {
   return (
     <PageLayout>
       <DefaultNavbar
-        action={{
-          type: "external",
-          route: "https://creative-tim.com/product/material-dashboard-react",
-          label: "free download",
-          color: "dark",
-        }}
+        
       />
       <MDBox
         position="absolute"

@@ -5,32 +5,42 @@ const jwt = require('jsonwebtoken');
 
 
 const register = async (req, res) => {
-    const { username, password, name, email, userType } = req.body;
+    const { password, name, email, userType } = req.body;  // Remove username from request body
 
     try {
-        
+        // Extract username from the email (portion before '@')
+        const username = email.split('@')[0];  // Automatically generate username from email
+
+        // Check if the username already exists in the Auth collection
         let existingAuth = await Auth.findOne({ username });
         if (existingAuth) {
             return res.status(400).json({ message: 'Username already exists' });
         }
 
-       
+        // Check if the email already exists in the User collection
+        let existingEmail = await User.findOne({ email });
+        if (existingEmail) {
+            return res.status(400).json({ message: 'Email already exists' });
+        }
+
+        // Hash the password
         const hashedPassword = await bcrypt.hash(password, 10);
 
-        
+        // Create a new Auth document for authentication with the role (userType)
         const newAuth = new Auth({
             username,
             password: hashedPassword,
+            role: userType,  // Assign the role based on the userType from the form
         });
 
         await newAuth.save();
 
-        
+        // Create a new User document with the associated details
         const newUser = new User({
-            username,
+            username,  // Use the extracted username
             name,
             email,
-            userType, 
+            userType,  // userType can be either "individual" or "business"
         });
 
         await newUser.save();
@@ -48,19 +58,19 @@ const login = async (req, res) => {
     const { username, password } = req.body;
 
     try {
-        
+        // Find the user by username
         const user = await Auth.findOne({ username });
         if (!user) {
             return res.status(400).json({ message: 'Invalid username or password' });
         }
 
-        
+        // Compare the provided password with the hashed password in the database
         const isMatch = await bcrypt.compare(password, user.password);
         if (!isMatch) {
             return res.status(400).json({ message: 'Invalid username or password' });
         }
 
-        
+        // Generate a JWT token
         const token = jwt.sign({ id: user._id }, process.env.JWT_SECRET, { expiresIn: '1h' });
 
         res.status(200).json({ token });
@@ -70,7 +80,6 @@ const login = async (req, res) => {
         res.status(500).json({ message: 'Server error' });
     }
 };
-
 
 const verifyToken = (req, res, next) => {
     const token = req.header('Authorization')?.split(' ')[1];
