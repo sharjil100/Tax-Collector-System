@@ -39,10 +39,12 @@ function SimpleBlogCard({ image, title, description, action }) {
           borderRadius="lg"
           shadow="md"
           width="100%"
-          height="100%"
+          height="200px" // Set a consistent height for all images
           position="relative"
           zIndex={1}
+          sx={{ objectFit: "cover" }} // Ensures the image maintains its aspect ratio
         />
+
         <MDBox
           borderRadius="lg"
           shadow="md"
