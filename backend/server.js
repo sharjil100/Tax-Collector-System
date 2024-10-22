@@ -1,4 +1,6 @@
 const express = require("express");
+const path = require('path'); // For handling static paths
+
 const connectDB = require("./config/database");
 const authRoutes = require("./routes/auth.routes");
 const userRoutes = require("./routes/user.routes");
@@ -16,6 +18,8 @@ connectDB();
 app.use(cors());
 app.use(express.json());
 
+// Serve static files from the 'uploads' directory
+app.use('/uploads', express.static(path.join(__dirname, 'uploads')));
 
 app.use("/api/auth", authRoutes);
 app.use("/api/users", userRoutes);
@@ -23,7 +27,7 @@ app.use("/api/taxfilling", taxRoutes);
 app.use("/api/payments", paymentRoutes);
 app.use("/api/notifications", notificationRoutes);
 app.use("/api/documents", documentRoutes);
-app.use("/api", testRoutes); 
+app.use("/api", testRoutes);
 
 const PORT = process.env.PORT || 5000;
 app.listen(PORT, () => {

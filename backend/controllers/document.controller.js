@@ -1,4 +1,3 @@
-
 const Document = require('../models/DocumentUpload.model');
 
 const uploadDocument = async (req, res) => {
