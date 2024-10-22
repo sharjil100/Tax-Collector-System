@@ -1,19 +1,5 @@
-/**
-=========================================================
-* Material Dashboard 2 React - v2.2.0
-=========================================================
-
-* Product Page: https://www.creative-tim.com/product/material-dashboard-react
-* Copyright 2023 Creative Tim (https://www.creative-tim.com)
-
-Coded by www.creative-tim.com
-
- =========================================================
-
-* The above copyright notice and this permission notice shall be included in all copies or substantial portions of the Software.
-*/
-
 import { useEffect } from "react";
+import { useNavigate } from "react-router-dom"; // For redirecting after Sign Out
 
 // react-router-dom components
 import { useLocation, NavLink } from "react-router-dom";
@@ -52,6 +38,7 @@ function Sidenav({ color, brand, brandName, routes, ...rest }) {
   const { miniSidenav, transparentSidenav, whiteSidenav, darkMode, sidenavColor } = controller;
   const location = useLocation();
   const collapseName = location.pathname.replace("/", "");
+  const navigate = useNavigate();  // For navigating to login after sign out
 
   let textColor = "white";
 
@@ -83,8 +70,17 @@ function Sidenav({ color, brand, brandName, routes, ...rest }) {
     return () => window.removeEventListener("resize", handleMiniSidenav);
   }, [dispatch, location]);
 
-  // Render all the routes from the routes.js (All the visible items on the Sidenav)
-  const renderRoutes = routes.map(({ type, name, icon, title, noCollapse, key, href, route }) => {
+  // Sign out logic
+  const handleSignOut = () => {
+    localStorage.removeItem("token"); // Clear the token
+    navigate("/authentication/sign-in"); // Redirect to Sign In page
+  };
+
+  // Filter out "Sign In" and "Sign Up" routes from the routes array
+  const filteredRoutes = routes.filter((route) => route.key !== "sign-in" && route.key !== "sign-up");
+
+  // Render all the filtered routes
+  const renderRoutes = filteredRoutes.map(({ type, name, icon, title, noCollapse, key, href, route }) => {
     let returnValue;
 
     if (type === "collapse") {
@@ -181,15 +177,12 @@ function Sidenav({ color, brand, brandName, routes, ...rest }) {
       <List>{renderRoutes}</List>
       <MDBox p={2} mt="auto">
         <MDButton
-          component="a"
-          href="https://github.com/sharjil100/Tax-Collector-System/wiki"
-          target="_blank"
-          rel="noreferrer"
+          onClick={handleSignOut} // Call the sign out function when clicked
           variant="gradient"
           color={sidenavColor}
           fullWidth
         >
-          Get Help
+          Sign Out
         </MDButton>
       </MDBox>
     </SidenavRoot>
