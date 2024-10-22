@@ -55,7 +55,7 @@ function Basic() {
   };
 
   return (
-    <BasicLayout image={bgImage}>
+    <BasicLayout image={bgImage} showNavbar={false}>
       <Card>
         <MDBox
           variant="gradient"

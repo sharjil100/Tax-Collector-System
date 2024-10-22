@@ -59,7 +59,7 @@ function Cover() {
   };
 
   return (
-    <CoverLayout image={bgImage}>
+    <CoverLayout image={bgImage} showNavbar={false}>
       <Card>
         <MDBox
           variant="gradient"
@@ -73,7 +73,7 @@ function Cover() {
           textAlign="center"
         >
           <MDTypography variant="h4" fontWeight="medium" color="white" mt={1}>
-            Join us today
+            Tax Collector System
           </MDTypography>
           <MDTypography display="block" variant="button" color="white" my={1}>
             Enter your details to register
