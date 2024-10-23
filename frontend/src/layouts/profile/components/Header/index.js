@@ -1,21 +1,4 @@
-/**
-=========================================================
-* Material Dashboard 2 React - v2.2.0
-=========================================================
-
-* Product Page: https://www.creative-tim.com/product/material-dashboard-react
-* Copyright 2023 Creative Tim (https://www.creative-tim.com)
-
-Coded by www.creative-tim.com
-
- =========================================================
-
-* The above copyright notice and this permission notice shall be included in all copies or substantial portions of the Software.
-*/
-
 import { useState, useEffect } from "react";
-
-// prop-types is a library for typechecking of props.
 import PropTypes from "prop-types";
 
 // @mui material components
@@ -35,34 +18,30 @@ import MDAvatar from "components/MDAvatar";
 import breakpoints from "assets/theme/base/breakpoints";
 
 // Images
-import burceMars from "assets/images/bruce-mars.jpg";
 import backgroundImage from "assets/images/bg-profile.jpeg";
+import defaultAvatar from "assets/images/default-avatar.png"; // Ensure you have a default avatar
 
-function Header({ children }) {
+function Header({ children, user }) {
   const [tabsOrientation, setTabsOrientation] = useState("horizontal");
   const [tabValue, setTabValue] = useState(0);
 
   useEffect(() => {
-    // A function that sets the orientation state of the tabs.
     function handleTabsOrientation() {
       return window.innerWidth < breakpoints.values.sm
         ? setTabsOrientation("vertical")
         : setTabsOrientation("horizontal");
     }
 
-    /** 
-     The event listener that's calling the handleTabsOrientation function when resizing the window.
-    */
     window.addEventListener("resize", handleTabsOrientation);
-
-    // Call the handleTabsOrientation function to set the state with the initial value.
     handleTabsOrientation();
-
-    // Remove event listener on cleanup
     return () => window.removeEventListener("resize", handleTabsOrientation);
   }, [tabsOrientation]);
 
   const handleSetTabValue = (event, newValue) => setTabValue(newValue);
+
+  // Set the avatar and name dynamically, fallback to default avatar and "N/A"
+  const userAvatar = user?.profilePicture || defaultAvatar; // Assuming `profilePicture` is a part of `user` object
+  const userName = user?.name || "N/A"; // Assuming `name` is a part of `user` object
 
   return (
     <MDBox position="relative" mb={5}>
@@ -94,15 +73,15 @@ function Header({ children }) {
       >
         <Grid container spacing={3} alignItems="center">
           <Grid item>
-            <MDAvatar src={burceMars} alt="profile-image" size="xl" shadow="sm" />
+            <MDAvatar src={userAvatar} alt="user-avatar" size="xl" shadow="sm" />
           </Grid>
           <Grid item>
             <MDBox height="100%" mt={0.5} lineHeight={1}>
               <MDTypography variant="h5" fontWeight="medium">
-                Richard Davis
+                {userName} {/* Display the user's name */}
               </MDTypography>
               <MDTypography variant="button" color="text" fontWeight="regular">
-                CEO / Co-Founder
+                {user?.role || "User"} {/* You can display the user's role if available */}
               </MDTypography>
             </MDBox>
           </Grid>
@@ -146,11 +125,20 @@ function Header({ children }) {
 // Setting default props for the Header
 Header.defaultProps = {
   children: "",
+  user: {
+    name: "N/A",
+    profilePicture: null,
+  },
 };
 
 // Typechecking props for the Header
 Header.propTypes = {
   children: PropTypes.node,
+  user: PropTypes.shape({
+    name: PropTypes.string,
+    profilePicture: PropTypes.string, // Assuming user profile picture is stored as a URL
+    role: PropTypes.string, // Optional user role field
+  }),
 };
 
 export default Header;

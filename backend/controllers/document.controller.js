@@ -39,4 +39,17 @@ const getDocumentById = async (req, res) => {
   }
 };
 
-module.exports = { uploadDocument, getDocumentById };
+const getDocumentsForUser = async (req, res) => {
+    try {
+      const documents = await Document.find({ userId: req.user._id });  // Fetch all documents for the logged-in user
+      if (!documents) {
+        return res.status(404).json({ message: 'No documents found' });
+      }
+      res.status(200).json(documents);
+    } catch (error) {
+      console.error('Error fetching documents:', error);
+      res.status(500).json({ message: 'Internal server error' });
+    }
+  };
+
+module.exports = { uploadDocument, getDocumentById, getDocumentsForUser };

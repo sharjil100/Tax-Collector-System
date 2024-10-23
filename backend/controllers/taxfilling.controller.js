@@ -1,6 +1,5 @@
 const TaxFiling = require('../models/TaxFilling.model');
-const Document = require('../models/DocumentUpload.model');  // Assuming you're using a document model
-
+const Document = require('../models/DocumentUpload.model');  
 const createtaxfilling = async (req, res) => {
   const {
     fullName,
@@ -18,7 +17,6 @@ const createtaxfilling = async (req, res) => {
   } = req.body;
   const file = req.file;  // Handle file uploads
 
-  // Log the incoming data for debugging purposes
   console.log('Received data:', {
     fullName,
     ssn,
@@ -35,22 +33,18 @@ const createtaxfilling = async (req, res) => {
     file,
   });
 
-  // Validate required fields
   if (!taxYear || isNaN(taxYear)) {
-    console.error("Tax Year is required or invalid");
     return res.status(400).json({ message: "Tax Year is required and must be a number" });
   }
   if (!wages || isNaN(wages)) {
-    console.error("Wages is required or invalid");
     return res.status(400).json({ message: "Wages is required and must be a number" });
   }
   if (deductions === undefined || isNaN(deductions)) {
-    console.error("Deductions is required or invalid");
     return res.status(400).json({ message: "Deductions must be a number" });
   }
 
   try {
-    // Create a new tax filing document
+    // Step 1: Create the tax filing entry
     const newTaxFiling = new TaxFiling({
       userId: req.user._id,
       fullName,
@@ -69,12 +63,24 @@ const createtaxfilling = async (req, res) => {
 
     await newTaxFiling.save();
 
-    // If a file was uploaded, handle the document upload
+    // Step 2: If a file is uploaded, create a document record
     if (file) {
       const documentUrl = `/uploads/${file.filename}`;
+
+      // Save the document in the TaxFiling model
       newTaxFiling.documentName = file.originalname;
       newTaxFiling.documentUrl = documentUrl;
       await newTaxFiling.save();
+
+      // Save the document in the Document model
+      const newDocument = new Document({
+        userId: req.user._id, // Link to the user
+        taxFilingId: newTaxFiling._id, // Link to the newly created tax filing
+        documentName: file.originalname,
+        documentUrl: documentUrl, // The path to the file
+      });
+      
+      await newDocument.save(); // Save the document record
     }
 
     console.log("Tax filing created successfully:", newTaxFiling);

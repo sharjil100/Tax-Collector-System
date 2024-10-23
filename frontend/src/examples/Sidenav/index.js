@@ -76,10 +76,10 @@ function Sidenav({ color, brand, brandName, routes, ...rest }) {
     navigate("/authentication/sign-in"); // Redirect to Sign In page
   };
 
-  // Filter out "Sign In" and "Sign Up" routes from the routes array
+  
   const filteredRoutes = routes.filter((route) => route.key !== "sign-in" && route.key !== "sign-up");
 
-  // Render all the filtered routes
+  
   const renderRoutes = filteredRoutes.map(({ type, name, icon, title, noCollapse, key, href, route }) => {
     let returnValue;
 
