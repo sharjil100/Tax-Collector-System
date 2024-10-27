@@ -7,6 +7,7 @@ import Profile from "layouts/profile";
 import SignIn from "layouts/authentication/sign-in";
 import SignUp from "layouts/authentication/sign-up";
 import TaxFiling from "layouts/taxFiling"
+import TaxCalculator from "layouts/TaxCalculation";
 
 // @mui icons
 import Icon from "@mui/material/Icon";
@@ -36,6 +37,14 @@ const routes = [
     route: "/billing",
     component: <Billing />,
   },
+  {
+    type: "collapse",
+    name: "Tax Calculator",
+    key: "calculate-tax",
+    icon: <Icon fontSize="small">calculate</Icon>,
+    route: "/calculate-tax",
+    component: <TaxCalculator />,
+  },  
   {
     type: "collapse",
     name: "File your tax",
