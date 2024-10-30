@@ -1,19 +1,4 @@
-/**
-=========================================================
-* Material Dashboard 2 React - v2.2.0
-=========================================================
-
-* Product Page: https://www.creative-tim.com/product/material-dashboard-react
-* Copyright 2023 Creative Tim (https://www.creative-tim.com)
-
-Coded by www.creative-tim.com
-
- =========================================================
-
-* The above copyright notice and this permission notice shall be included in all copies or substantial portions of the Software.
-*/
-
-// @mui material components
+// This is PayYourTax -> index.js
 import Grid from "@mui/material/Grid";
 
 // Material Dashboard 2 React components
@@ -26,13 +11,13 @@ import Footer from "examples/Footer";
 import MasterCard from "examples/Cards/MasterCard";
 import DefaultInfoCard from "examples/Cards/InfoCards/DefaultInfoCard";
 
-// Billing page components
+// Pay Your Tax page components
 import PaymentMethod from "layouts/billing/components/PaymentMethod";
 import Invoices from "layouts/billing/components/Invoices";
 import BillingInformation from "layouts/billing/components/BillingInformation";
 import Transactions from "layouts/billing/components/Transactions";
 
-function Billing() {
+function PayYourTax() {
   return (
     <DashboardLayout>
       <DashboardNavbar absolute isMini />
@@ -86,4 +71,4 @@ function Billing() {
   );
 }
 
-export default Billing;
+export default PayYourTax;

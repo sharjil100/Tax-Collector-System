@@ -1,12 +1,11 @@
 import Dashboard from "layouts/dashboard";
 import Tables from "layouts/tables";
-import Billing from "layouts/billing";
-//import RTL from "layouts/rtl";
+import PayYourTax from "layouts/billing"; // Ensure component import is consistent with new name
 import Notifications from "layouts/notifications";
 import Profile from "layouts/profile";
 import SignIn from "layouts/authentication/sign-in";
 import SignUp from "layouts/authentication/sign-up";
-import TaxFiling from "layouts/taxFiling"
+import TaxFiling from "layouts/taxFiling";
 import TaxCalculator from "layouts/TaxCalculation";
 
 // @mui icons
@@ -31,11 +30,11 @@ const routes = [
   },
   {
     type: "collapse",
-    name: "Billing",
-    key: "billing",
+    name: "Pay Your Tax", // Updated name
+    key: "pay-your-tax", // Updated key
     icon: <Icon fontSize="small">receipt_long</Icon>,
-    route: "/billing",
-    component: <Billing />,
+    route: "/pay-your-tax", // Updated route
+    component: <PayYourTax />, // Ensure component import matches updated name
   },
   {
     type: "collapse",
@@ -44,7 +43,7 @@ const routes = [
     icon: <Icon fontSize="small">calculate</Icon>,
     route: "/calculate-tax",
     component: <TaxCalculator />,
-  },  
+  },
   {
     type: "collapse",
     name: "File your tax",
