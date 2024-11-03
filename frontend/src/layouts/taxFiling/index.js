@@ -5,6 +5,12 @@ import MDBox from "components/MDBox";
 import MDButton from "components/MDButton";
 import MDTypography from "components/MDTypography";
 import Grid from "@mui/material/Grid";
+import Dialog from "@mui/material/Dialog";
+import DialogActions from "@mui/material/DialogActions";
+import DialogContent from "@mui/material/DialogContent";
+import DialogContentText from "@mui/material/DialogContentText";
+import DialogTitle from "@mui/material/DialogTitle";
+import { useNavigate } from "react-router-dom";
 
 function TaxFilingForm() {
   const [taxData, setTaxData] = useState({
@@ -12,7 +18,7 @@ function TaxFilingForm() {
     ssn: "",
     dob: "",
     address: "",
-    taxYear: "",  // Added Tax Year field
+    taxYear: "",
     wages: "",
     selfEmploymentIncome: "",
     investmentIncome: "",
@@ -22,7 +28,9 @@ function TaxFilingForm() {
     bankRouting: "",
   });
 
-  const [file, setFile] = useState(null); // State for file upload
+  const [file, setFile] = useState(null);
+  const [successPopup, setSuccessPopup] = useState(false);
+  const navigate = useNavigate();
 
   const handleChange = (e) => {
     setTaxData({
@@ -37,8 +45,7 @@ function TaxFilingForm() {
 
   const handleSubmit = async (e) => {
     e.preventDefault();
-  
-    // Validate form inputs
+
     if (!taxData.taxYear || isNaN(taxData.taxYear)) {
       alert("Please enter a valid Tax Year");
       return;
@@ -51,34 +58,27 @@ function TaxFilingForm() {
       alert("Please enter valid Deductions");
       return;
     }
-  
-    // Prepare form data
+
     const formData = new FormData();
-    
-    // Personal Information
+
     formData.append("fullName", taxData.fullName);
     formData.append("ssn", taxData.ssn);
     formData.append("dob", taxData.dob);
     formData.append("address", taxData.address);
-  
-    // Tax Information
     formData.append("taxYear", taxData.taxYear);
     formData.append("wages", taxData.wages);
     formData.append("selfEmploymentIncome", taxData.selfEmploymentIncome);
     formData.append("investmentIncome", taxData.investmentIncome);
     formData.append("deductions", taxData.deductions);
     formData.append("federalTaxPaid", taxData.federalTaxPaid);
-  
-    // Bank Information
     formData.append("bankAccount", taxData.bankAccount);
     formData.append("bankRouting", taxData.bankRouting);
-  
-    // File (if any)
+
     if (file) {
       formData.append("file", file);
       formData.append("documentName", file.name);
     }
-  
+
     try {
       const token = localStorage.getItem("token");
       const response = await fetch("http://localhost:5000/api/taxfilling", {
@@ -88,9 +88,10 @@ function TaxFilingForm() {
           Authorization: `Bearer ${token}`,
         },
       });
-  
+
       const data = await response.json();
       if (response.ok) {
+        setSuccessPopup(true);
         console.log("Form submitted successfully:", data);
       } else {
         console.error("Error submitting form:", data);
@@ -99,7 +100,11 @@ function TaxFilingForm() {
       console.error("Server error:", error);
     }
   };
-  
+
+  const handleNavigate = (path) => {
+    setSuccessPopup(false);
+    navigate(path);
+  };
 
   return (
     <MDBox p={3} sx={{ display: "flex", justifyContent: "center" }}>
@@ -111,7 +116,6 @@ function TaxFilingForm() {
                 File Your Tax Return
               </MDTypography>
               <form onSubmit={handleSubmit}>
-                {/* Personal Information Section */}
                 <MDTypography variant="h6" fontWeight="medium" gutterBottom>
                   Personal Information
                 </MDTypography>
@@ -154,8 +158,6 @@ function TaxFilingForm() {
                       onChange={handleChange}
                     />
                   </Grid>
-
-                  {/* Tax Year Field */}
                   <Grid item xs={12} sm={6}>
                     <TextField
                       fullWidth
@@ -169,7 +171,6 @@ function TaxFilingForm() {
                   </Grid>
                 </Grid>
 
-                {/* Income Section */}
                 <MDTypography variant="h6" fontWeight="medium" mt={3} gutterBottom>
                   Income Information
                 </MDTypography>
@@ -206,7 +207,6 @@ function TaxFilingForm() {
                   </Grid>
                 </Grid>
 
-                {/* Deductions Section */}
                 <MDTypography variant="h6" fontWeight="medium" mt={3} gutterBottom>
                   Deductions
                 </MDTypography>
@@ -223,7 +223,6 @@ function TaxFilingForm() {
                   </Grid>
                 </Grid>
 
-                {/* Tax Payments Section */}
                 <MDTypography variant="h6" fontWeight="medium" mt={3} gutterBottom>
                   Tax Payments
                 </MDTypography>
@@ -240,7 +239,6 @@ function TaxFilingForm() {
                   </Grid>
                 </Grid>
 
-                {/* Bank Information */}
                 <MDTypography variant="h6" fontWeight="medium" mt={3} gutterBottom>
                   Bank Information
                 </MDTypography>
@@ -265,7 +263,6 @@ function TaxFilingForm() {
                   </Grid>
                 </Grid>
 
-                {/* Document Upload */}
                 <MDBox my={2}>
                   <MDTypography variant="h6" fontWeight="medium">
                     Upload Supporting Documents
@@ -285,6 +282,30 @@ function TaxFilingForm() {
           </Card>
         </Grid>
       </Grid>
+
+      {/* Success Dialog */}
+      <Dialog open={successPopup} onClose={() => setSuccessPopup(false)}>
+        <DialogTitle>Success</DialogTitle>
+        <DialogContent>
+          <DialogContentText>Your tax filing was successful.</DialogContentText>
+        </DialogContent>
+        <DialogActions>
+          <MDButton
+            variant="contained"
+            color="primary"
+            onClick={() => handleNavigate("/calculate-tax")}
+          >
+            Proceed to Tax Calculation
+          </MDButton>
+          <MDButton
+            variant="outlined"
+            color="secondary"
+            onClick={() => handleNavigate("/dashboard")}
+          >
+            Dashboard
+          </MDButton>
+        </DialogActions>
+      </Dialog>
     </MDBox>
   );
 }

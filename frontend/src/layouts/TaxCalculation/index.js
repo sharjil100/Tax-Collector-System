@@ -158,7 +158,7 @@ function TaxCalculator() {
   };
 
   const handlePayNow = () => {
-    navigate("/pay-your-tax"); // Redirect to "Pay Your Tax" page
+    navigate("/pay-your-tax", {state: { payableDue: taxDetails.tax }}); // Redirect to "Pay Your Tax" page
   };
 
   return (
