@@ -158,7 +158,13 @@ function TaxCalculator() {
   };
 
   const handlePayNow = () => {
-    navigate("/pay-your-tax", {state: { payableDue: taxDetails.tax }}); // Redirect to "Pay Your Tax" page
+    const taxFilingId = localStorage.getItem("taxFilingId"); // Retrieve from localStorage
+    if (!taxFilingId) {
+      alert("Tax filing ID not found. Please complete the filing process first.");
+      return;
+    }
+
+    navigate("/pay-your-tax", { state: { taxFilingId, payableDue: taxDetails.tax } });
   };
 
   return (
