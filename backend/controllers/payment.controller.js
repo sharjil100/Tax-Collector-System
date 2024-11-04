@@ -31,7 +31,8 @@ const makePayment = async (req, res) => {
     console.log('Payment created successfully:', newPayment);
 
     
-    res.status(201).json(newPayment);
+    res.status(201).json({ payment: newPayment });
+
   } catch (error) {
    
     console.error('Error creating payment:', error); 
