@@ -1,10 +1,8 @@
-// This is PayYourTax -> index.js
-import Grid from "@mui/material/Grid";
+import { useState } from "react";
 import { useLocation } from "react-router-dom";
+import Grid from "@mui/material/Grid";
 import MDBox from "components/MDBox";
 import MDButton from "components/MDButton";
-import { useState } from "react";
-
 // Material Dashboard 2 React components
 import DashboardLayout from "examples/LayoutContainers/DashboardLayout";
 import DashboardNavbar from "examples/Navbars/DashboardNavbar";
@@ -20,12 +18,47 @@ import Transactions from "layouts/billing/components/Transactions";
 
 function PayYourTax() {
   const { state } = useLocation();
-  const payableDue = state?.payableDue || 0; // Get tax due value from calculator page
-  const [paymentMethod, setPaymentMethod] = useState("bank");
+  const taxFilingId = state?.taxFilingId;  // Retrieve taxFilingId from state
+  const initialPayableDue = Number(state?.payableDue) || 0;
+  
+  const [payableDue, setPayableDue] = useState(initialPayableDue);
+  const [paymentMethod, setPaymentMethod] = useState("Bank Transfer");
+  const [isPaymentSuccessful, setIsPaymentSuccessful] = useState(false);
 
-  const handlePayment = () => {
-    // Payment processing logic can be added here
-    alert(`Payment of ৳ ${payableDue} initiated using ${paymentMethod}.`);
+  const handlePayment = async () => {
+    try {
+      const token = localStorage.getItem("token"); 
+      if (!token) {
+        alert("Authentication token not found. Please log in again.");
+        return;
+      }
+
+      const response = await fetch('http://localhost:5000/api/payments', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+          'Authorization': `Bearer ${token}`,
+        },
+        body: JSON.stringify({
+          taxFilingId,
+          amountPaid: payableDue,
+          paymentMethod,
+        }),
+      });
+
+      const data = await response.json();
+      if (response.ok) {
+        alert(`Payment successful: Payment ID ${data.payment._id}`);
+        
+        // Update states to reflect payment success
+        setPayableDue(0); // Use state setter to update payableDue
+        setIsPaymentSuccessful(true);
+      } else {
+        alert(`Payment failed: ${data.message}`);
+      }
+    } catch (error) {
+      alert(`Payment failed: ${error.message}`);
+    }
   };
 
   return (
@@ -48,7 +81,7 @@ function PayYourTax() {
                     icon="account_balance_wallet"
                     title="Total Tax Due"
                     description="Your current tax amount"
-                    value={`৳ ${payableDue}`}
+                    value={`৳ ${(payableDue || 0).toFixed(2)}`} // Shows 0 after payment is successful
                   />
                 </Grid>
 
@@ -70,27 +103,27 @@ function PayYourTax() {
                       {/* Payment Options */}
                       <Grid item>
                         <MDButton
-                          variant={paymentMethod === "bank" ? "contained" : "outlined"}
+                          variant={paymentMethod === "Bank Transfer" ? "contained" : "outlined"}
                           color="info"
-                          onClick={() => setPaymentMethod("bank")}
+                          onClick={() => setPaymentMethod("Bank Transfer")}
                         >
-                          Bank
+                          Bank Transfer
                         </MDButton>
                       </Grid>
                       <Grid item>
                         <MDButton
-                          variant={paymentMethod === "bkash" ? "contained" : "outlined"}
+                          variant={paymentMethod === "BKASH" ? "contained" : "outlined"}
                           color="info"
-                          onClick={() => setPaymentMethod("bkash")}
+                          onClick={() => setPaymentMethod("BKASH")}
                         >
                           BKASH
                         </MDButton>
                       </Grid>
                       <Grid item>
                         <MDButton
-                          variant={paymentMethod === "nagad" ? "contained" : "outlined"}
+                          variant={paymentMethod === "NAGAD" ? "contained" : "outlined"}
                           color="info"
-                          onClick={() => setPaymentMethod("nagad")}
+                          onClick={() => setPaymentMethod("NAGAD")}
                         >
                           NAGAD
                         </MDButton>
@@ -106,7 +139,7 @@ function PayYourTax() {
                       fullWidth
                       onClick={handlePayment}
                     >
-                      Pay Now - ৳ {payableDue}
+                      {isPaymentSuccessful ? "Payment Completed" : `Pay Now - ৳ ${payableDue}`}
                     </MDButton>
                   </MDBox>
                 </Grid>
