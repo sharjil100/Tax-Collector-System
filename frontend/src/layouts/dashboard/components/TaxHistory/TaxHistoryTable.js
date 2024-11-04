@@ -1,46 +1,25 @@
-// @mui material components
+import React, { useEffect, useState } from "react";
+import axios from "axios";
 import Table from "@mui/material/Table";
 import TableBody from "@mui/material/TableBody";
 import TableContainer from "@mui/material/TableContainer";
 import TableRow from "@mui/material/TableRow";
 import TableCell from "@mui/material/TableCell";
 import Paper from "@mui/material/Paper";
-
-// Material Dashboard 2 React components
 import MDBox from "components/MDBox";
 import MDTypography from "components/MDTypography";
-
-// Custom components
 import DataTableHeadCell from "examples/Tables/DataTable/DataTableHeadCell";
 
 function TaxHistoryTable() {
-  // Sample data for the table rows
-  const taxHistory = [
-    {
-      date: "15 OCT 2024",
-      type: "Payment",
-      amount: "$1500",
-      status: "Completed",
-    },
-    {
-      date: "10 OCT 2024",
-      type: "Notice",
-      amount: "N/A",
-      status: "Late Filing",
-    },
-    {
-      date: "5 OCT 2024",
-      type: "Refund",
-      amount: "$300",
-      status: "Processed",
-    },
-    {
-      date: "1 OCT 2024",
-      type: "Payment",
-      amount: "$2000",
-      status: "Pending",
-    },
-  ];
+  const [taxHistory, setTaxHistory] = useState([]);
+
+  useEffect(() => {
+    axios.get("http://localhost:5000/api/payments/user", {
+      headers: { Authorization: `Bearer ${localStorage.getItem("token")}` } 
+    })
+      .then((response) => setTaxHistory(response.data))
+      .catch((error) => console.error(error));
+  }, []);
 
   return (
     <TableContainer component={Paper}>
@@ -52,27 +31,19 @@ function TaxHistoryTable() {
       <Table>
         <thead>
           <TableRow>
-            <DataTableHeadCell align="left" sorted="none">
-              Date
-            </DataTableHeadCell>
-            <DataTableHeadCell align="left" sorted="none">
-              Type
-            </DataTableHeadCell>
-            <DataTableHeadCell align="center" sorted="none">
-              Amount
-            </DataTableHeadCell>
-            <DataTableHeadCell align="center" sorted="none">
-              Status
-            </DataTableHeadCell>
+            <DataTableHeadCell align="left" sorted="none">Date</DataTableHeadCell>
+            <DataTableHeadCell align="left" sorted="none">Payment Method</DataTableHeadCell>
+            <DataTableHeadCell align="center" sorted="none">Amount</DataTableHeadCell>
+            <DataTableHeadCell align="center" sorted="none">Status</DataTableHeadCell>
           </TableRow>
         </thead>
         <TableBody>
           {taxHistory.map((row, index) => (
             <TableRow key={index}>
-              <TableCell>{row.date}</TableCell>
-              <TableCell>{row.type}</TableCell>
-              <TableCell align="center">{row.amount}</TableCell>
-              <TableCell align="center">{row.status}</TableCell>
+              <TableCell>{new Date(row.paymentDate).toLocaleDateString()}</TableCell>
+              <TableCell>{row.paymentMethod}</TableCell>
+              <TableCell align="center">${row.amountPaid}</TableCell>
+              <TableCell align="center">{row.paymentStatus}</TableCell>
             </TableRow>
           ))}
         </TableBody>

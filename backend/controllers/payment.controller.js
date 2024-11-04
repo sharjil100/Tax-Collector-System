@@ -39,4 +39,13 @@ const makePayment = async (req, res) => {
   }
 };
 
-module.exports = { makePayment };
+const getUserPayments = async (req, res) => {
+  try {
+    const payments = await Payment.find({ userId: req.user.id });
+    res.status(200).json(payments);
+  } catch (error) {
+    res.status(500).json({ message: "Error fetching payments" });
+  }
+};
+
+module.exports = { makePayment, getUserPayments };
