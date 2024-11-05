@@ -9,6 +9,8 @@ const notificationRoutes = require("./routes/notification.routes");
 const taxRoutes = require("./routes/taxfilling.routes");
 const documentRoutes = require("./routes/document.routes");
 const testRoutes = require("./routes/test.routes"); 
+const invoiceRoutes = require("./routes/invoice.routes");
+const { authenticate } = require("./middleware/auth.middleware");
 const cors = require("cors");
 require("dotenv").config();
 
@@ -28,6 +30,7 @@ app.use("/api/payments", paymentRoutes);
 app.use("/api/notifications", notificationRoutes);
 app.use("/api/documents", documentRoutes);
 app.use("/api", testRoutes);
+app.use("/api/invoices", authenticate, invoiceRoutes)
 
 const PORT = process.env.PORT || 5000;
 app.listen(PORT, () => {

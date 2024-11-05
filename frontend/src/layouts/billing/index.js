@@ -27,17 +27,18 @@ function PayYourTax() {
 
   const handlePayment = async () => {
     try {
-      const token = localStorage.getItem("token"); 
+      const token = localStorage.getItem("token");
       if (!token) {
         alert("Authentication token not found. Please log in again.");
         return;
       }
-
-      const response = await fetch('http://localhost:5000/api/payments', {
-        method: 'POST',
+  
+      // Make the payment request
+      const response = await fetch("http://localhost:5000/api/payments", {
+        method: "POST",
         headers: {
-          'Content-Type': 'application/json',
-          'Authorization': `Bearer ${token}`,
+          "Content-Type": "application/json",
+          Authorization: `Bearer ${token}`,
         },
         body: JSON.stringify({
           taxFilingId,
@@ -45,13 +46,16 @@ function PayYourTax() {
           paymentMethod,
         }),
       });
-
+  
       const data = await response.json();
       if (response.ok) {
         alert(`Payment successful: Payment ID ${data.payment._id}`);
-        
-        // Update states to reflect payment success
-        setPayableDue(0); // Use state setter to update payableDue
+  
+        // Create invoice after successful payment
+        await createInvoice(); // Call to create the invoice in the backend
+  
+        // Update state to reflect payment success
+        setPayableDue(0);
         setIsPaymentSuccessful(true);
       } else {
         alert(`Payment failed: ${data.message}`);
@@ -60,6 +64,33 @@ function PayYourTax() {
       alert(`Payment failed: ${error.message}`);
     }
   };
+  
+  // Function to create an invoice
+  // Function to create an invoice
+const createInvoice = async () => {
+  const token = localStorage.getItem("token");
+  const response = await fetch("http://localhost:5000/api/invoices", {
+    method: "POST",
+    headers: {
+      "Content-Type": "application/json",
+      Authorization: `Bearer ${token}`,
+    },
+    body: JSON.stringify({
+      amount: payableDue,
+      description: `Payment for Tax Filing ID ${taxFilingId}`,
+      status: "paid",
+    }),
+  });
+
+  if (response.ok) {
+    const invoiceData = await response.json();
+    alert(`Invoice created successfully with ID: ${invoiceData.invoice._id}`);
+  } else {
+    alert("Failed to create invoice.");
+  }
+};
+
+  
 
   return (
     <DashboardLayout>
@@ -148,7 +179,7 @@ function PayYourTax() {
 
             {/* Right section containing Invoices */}
             <Grid item xs={12} lg={4}>
-              <Invoices />
+            <Invoices isPaymentSuccessful={isPaymentSuccessful} />
             </Grid>
           </Grid>
         </MDBox>
