@@ -1,20 +1,18 @@
 const Payment = require('../models/Payment.model');
 const TaxFiling = require('../models/TaxFilling.model');
+const Notification = require('../models/Notification.model'); // Import Notification model
 
 const makePayment = async (req, res) => {
-  
   console.log('Received payment request:', req.body);
   
   const { taxFilingId, amountPaid, paymentMethod } = req.body;
 
-  
   if (!taxFilingId || !amountPaid || !paymentMethod) {
     console.error('Missing required fields:', { taxFilingId, amountPaid, paymentMethod });
     return res.status(400).json({ message: 'Missing required fields.' });
   }
 
   try {
-    
     console.log('User ID from request:', req.user.id);
 
     const newPayment = new Payment({
@@ -24,18 +22,31 @@ const makePayment = async (req, res) => {
       paymentMethod        
     });
 
-    
     await newPayment.save();
 
-    
+    // Create success notification
+    const successNotification = new Notification({
+      userId: req.user.id,
+      notificationType: 'Payment Success',
+      message: `Your payment of $${amountPaid} was successful.`,
+    });
+    await successNotification.save();
+
     console.log('Payment created successfully:', newPayment);
 
-    
     res.status(201).json({ payment: newPayment });
 
   } catch (error) {
-   
     console.error('Error creating payment:', error); 
+
+    // Create failure notification
+    const failureNotification = new Notification({
+      userId: req.user.id,
+      notificationType: 'Payment Failure',
+      message: `Your payment of $${req.body.amountPaid} failed. Please try again.`,
+    });
+    await failureNotification.save();
+
     res.status(400).json({ message: error.message });
   }
 };
@@ -54,7 +65,8 @@ module.exports = { makePayment, getUserPayments };
 
 // dummy payment system with stripe
 // npm install stripe
-/* try {
+/* 
+try {
     // Create a payment intent on Stripe
     const paymentIntent = await stripe.paymentIntents.create({
       amount: amountPaid * 100,  // Stripe expects amount in cents
@@ -80,5 +92,5 @@ module.exports = { makePayment, getUserPayments };
     });
 
     await newPayment.save();
-    */
-
+}
+*/

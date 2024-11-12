@@ -1,5 +1,6 @@
 const TaxFiling = require('../models/TaxFilling.model');
-const Document = require('../models/DocumentUpload.model');  
+const Document = require('../models/DocumentUpload.model');
+const Notification = require('../models/Notification.model');
 
 const createtaxfilling = async (req, res) => {
   const {
@@ -16,7 +17,7 @@ const createtaxfilling = async (req, res) => {
     bankAccount,
     bankRouting,
   } = req.body;
-  const file = req.file;  // Handle file uploads
+  const file = req.file; // Handle file uploads
 
   console.log('Received data:', {
     fullName,
@@ -34,7 +35,6 @@ const createtaxfilling = async (req, res) => {
     file,
   });
 
-  // Validate input fields
   if (!taxYear || isNaN(taxYear)) {
     return res.status(400).json({ message: "Tax Year is required and must be a number" });
   }
@@ -46,13 +46,13 @@ const createtaxfilling = async (req, res) => {
   }
 
   try {
-    // Step 1: Check if tax filing for the same year already exists
+    // Check if tax filing for the same year already exists
     const existingFiling = await TaxFiling.findOne({ userId: req.user._id, taxYear });
     if (existingFiling) {
       return res.status(409).json({ message: 'You have already filed taxes for this year.' });
     }
 
-    // Step 2: Create the tax filing entry
+    // Create the tax filing entry
     const newTaxFiling = new TaxFiling({
       userId: req.user._id,
       fullName,
@@ -71,30 +71,45 @@ const createtaxfilling = async (req, res) => {
 
     await newTaxFiling.save();
 
-    // Step 3: If a file is uploaded, create a document record
+    // If a file is uploaded, create a document record
     if (file) {
       const documentUrl = `/uploads/${file.filename}`;
-
-      // Save the document in the TaxFiling model
       newTaxFiling.documentName = file.originalname;
       newTaxFiling.documentUrl = documentUrl;
       await newTaxFiling.save();
 
-      // Save the document in the Document model
       const newDocument = new Document({
-        userId: req.user._id, // Link to the user
-        taxFilingId: newTaxFiling._id, // Link to the newly created tax filing
+        userId: req.user._id,
+        taxFilingId: newTaxFiling._id,
         documentName: file.originalname,
-        documentUrl: documentUrl, // The path to the file
+        documentUrl: documentUrl,
       });
-      
-      await newDocument.save(); // Save the document record
+      await newDocument.save();
     }
+
+    // Create success notification
+    console.log("Attempting to create success notification...");
+    const successNotification = new Notification({
+      userId: req.user._id,
+      notificationType: 'Tax Filing Success',
+      message: `Your tax filing for the year ${taxYear} was successful.`,
+    });
+    await successNotification.save();
+    console.log("Notification created successfully:", successNotification);
 
     console.log("Tax filing created successfully:", newTaxFiling);
     res.status(201).json(newTaxFiling);
   } catch (error) {
     console.error("Error creating tax filing:", error);
+
+    // Create failure notification
+    const failureNotification = new Notification({
+      userId: req.user._id,
+      notificationType: 'Tax Filing Failure',
+      message: `Your tax filing for the year ${req.body.taxYear} failed. Please try again.`,
+    });
+    await failureNotification.save();
+
     res.status(500).json({ message: "Internal server error" });
   }
 };
