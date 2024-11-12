@@ -1,14 +1,17 @@
 import React from "react";
 import Grid from "@mui/material/Grid";
+import Card from "@mui/material/Card";
+import CardContent from "@mui/material/CardContent";
+import CardMedia from "@mui/material/CardMedia";
+import Typography from "@mui/material/Typography";
+import Button from "@mui/material/Button";
 import MDBox from "components/MDBox"; // Assuming this is your layout wrapper
-import SimpleBlogCard from "examples/Cards/BlogCards/SimpleBlogCard";
 
 function NoticeBoard() {
-  // Static notices for tax-related information
   const notices = [
     {
       id: 1,
-      image: "https://profit-whiz.com/wp-content/uploads/2024/07/Untitled-design144-1024x576.png", // Example image URL
+      image: "https://profit-whiz.com/wp-content/uploads/2024/07/Untitled-design144-1024x576.png",
       title: "New Tax Regulations for 2024",
       description: "The government has updated the tax regulations for 2024. Click to learn more.",
       link: "https://nbr.gov.bd/taxtypes/income-tax/income-tax-paripatra/eng",
@@ -37,22 +40,67 @@ function NoticeBoard() {
   ];
 
   return (
-    <MDBox p={2}>
-      <Grid container spacing={4}> {/* Increased spacing from 3 to 4 */}
-        {/* Iterate through static notices and display each one as a card */}
+    <MDBox
+      p={3}
+      mt={4}
+      mb={4}
+      style={{
+        backgroundImage: `linear-gradient(to right, #e0f7fa, #e3f2fd)`,
+        color: "#333",
+        borderRadius: "12px",
+        boxShadow: "0 6px 12px rgba(0, 0, 0, 0.1)",
+      }}
+    >
+      <Typography variant="h5" style={{ fontWeight: "bold", color: "#333", marginBottom: "20px" }}>
+        Notice Board
+      </Typography>
+      <Grid container spacing={4}>
         {notices.map((notice) => (
           <Grid item xs={12} md={6} key={notice.id}>
-            <SimpleBlogCard
-              image={notice.image} // Image URL for the notice
-              title={notice.title} // Title of the notice
-              description={notice.description} // Short description of the notice
-              action={{
-                type: "external",
-                route: notice.link, // Link to the government website for that notice
-                color: "info", // Button color
-                label: "Read More", // Button label
+            <Card
+              style={{
+                backgroundColor: "rgba(255, 255, 255, 0.9)", // Light background for each card
+                borderRadius: "12px",
+                boxShadow: "0 4px 10px rgba(0, 0, 0, 0.1)", // Soft shadow for cards
               }}
-            />
+            >
+              <CardMedia
+                component="img"
+                height="140"
+                image={notice.image}
+                alt={notice.title}
+                style={{ borderRadius: "12px 12px 0 0" }}
+              />
+              <CardContent>
+                <Typography variant="h6" style={{ color: "#333", fontWeight: "bold" }}>
+                  {notice.title}
+                </Typography>
+                <Typography variant="body2" style={{ color: "#555", marginBottom: "12px" }}>
+                  {notice.description}
+                </Typography>
+                <Button
+                  variant="contained"
+                  href={notice.link}
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  style={{
+                    backgroundColor: "#00796b",
+                    color: "#fff",
+                    textTransform: "none",
+                    boxShadow: "0px 0px 8px 2px rgba(0, 121, 107, 0.6)", // Glowing neon effect
+                    transition: "box-shadow 0.3s ease-in-out",
+                  }}
+                  onMouseOver={(e) => {
+                    e.currentTarget.style.boxShadow = "0px 0px 12px 4px rgba(0, 121, 107, 0.8)";
+                  }}
+                  onMouseOut={(e) => {
+                    e.currentTarget.style.boxShadow = "0px 0px 8px 2px rgba(0, 121, 107, 0.6)";
+                  }}
+                >
+                  Read More
+                </Button>
+              </CardContent>
+            </Card>
           </Grid>
         ))}
       </Grid>
