@@ -51,3 +51,34 @@ const getUserPayments = async (req, res) => {
 
 module.exports = { makePayment, getUserPayments };
 
+
+// dummy payment system with stripe
+// npm install stripe
+/* try {
+    // Create a payment intent on Stripe
+    const paymentIntent = await stripe.paymentIntents.create({
+      amount: amountPaid * 100,  // Stripe expects amount in cents
+      currency: 'usd',
+      payment_method_types: [paymentMethod],  // E.g., 'card'
+      metadata: { taxFilingId, userId: req.user.id }
+    });
+
+    // Confirm the payment intent (for simplicity, assuming payment is confirmed immediately)
+    const confirmedPayment = await stripe.paymentIntents.confirm(paymentIntent.id);
+
+    // Log confirmation for faculty demo purposes
+    console.log('Stripe Payment Intent confirmed:', confirmedPayment);
+
+    // Create and save the payment record locally in your database
+    const newPayment = new Payment({
+      userId: req.user.id,
+      taxFilingId,
+      amountPaid,
+      paymentMethod,
+      paymentStatus: 'completed',  // Set based on confirmation
+      transactionId: confirmedPayment.id,  // Store Stripe's transaction ID
+    });
+
+    await newPayment.save();
+    */
+

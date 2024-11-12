@@ -1,5 +1,6 @@
 const TaxFiling = require('../models/TaxFilling.model');
 const Document = require('../models/DocumentUpload.model');  
+
 const createtaxfilling = async (req, res) => {
   const {
     fullName,
@@ -33,6 +34,7 @@ const createtaxfilling = async (req, res) => {
     file,
   });
 
+  // Validate input fields
   if (!taxYear || isNaN(taxYear)) {
     return res.status(400).json({ message: "Tax Year is required and must be a number" });
   }
@@ -44,7 +46,13 @@ const createtaxfilling = async (req, res) => {
   }
 
   try {
-    // Step 1: Create the tax filing entry
+    // Step 1: Check if tax filing for the same year already exists
+    const existingFiling = await TaxFiling.findOne({ userId: req.user._id, taxYear });
+    if (existingFiling) {
+      return res.status(409).json({ message: 'You have already filed taxes for this year.' });
+    }
+
+    // Step 2: Create the tax filing entry
     const newTaxFiling = new TaxFiling({
       userId: req.user._id,
       fullName,
@@ -63,7 +71,7 @@ const createtaxfilling = async (req, res) => {
 
     await newTaxFiling.save();
 
-    // Step 2: If a file is uploaded, create a document record
+    // Step 3: If a file is uploaded, create a document record
     if (file) {
       const documentUrl = `/uploads/${file.filename}`;
 

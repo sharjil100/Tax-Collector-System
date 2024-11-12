@@ -30,6 +30,8 @@ function TaxFilingForm() {
 
   const [file, setFile] = useState(null);
   const [successPopup, setSuccessPopup] = useState(false);
+  const [errorPopup, setErrorPopup] = useState(false); // New error popup state
+  const [errorMessage, setErrorMessage] = useState(""); // New error message state
   const navigate = useNavigate();
 
   const handleChange = (e) => {
@@ -95,6 +97,10 @@ function TaxFilingForm() {
         localStorage.setItem("taxFilingId", taxFilingId);
         setSuccessPopup(true);
         console.log("Form submitted successfully:", data);
+      } else if (response.status === 409) {
+        // Show error popup if tax for the year already exists
+        setErrorMessage(data.message || "You have already filed taxes for this year.");
+        setErrorPopup(true);
       } else {
         console.error("Error submitting form:", data);
       }
@@ -305,6 +311,23 @@ function TaxFilingForm() {
             onClick={() => handleNavigate("/dashboard")}
           >
             Dashboard
+          </MDButton>
+        </DialogActions>
+      </Dialog>
+
+      {/* Error Dialog */}
+      <Dialog open={errorPopup} onClose={() => setErrorPopup(false)}>
+        <DialogTitle>Error</DialogTitle>
+        <DialogContent>
+          <DialogContentText>{errorMessage}</DialogContentText>
+        </DialogContent>
+        <DialogActions>
+          <MDButton
+            variant="contained"
+            color="primary"
+            onClick={() => setErrorPopup(false)}
+          >
+            Close
           </MDButton>
         </DialogActions>
       </Dialog>
