@@ -92,5 +92,10 @@ try {
     });
 
     await newPayment.save();
+
+    Create a Stripe Account: Go to Stripe and sign up for an account if you haven't already.
+    Get API Keys:
+    After logging in, navigate to Developers > API keys.
+    Copy the Publishable key and Secret key from the dashboard.
 }
 */
