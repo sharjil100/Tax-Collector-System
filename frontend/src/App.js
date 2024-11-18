@@ -17,10 +17,23 @@ import routes from "routes";
 import { useMaterialUIController, setMiniSidenav, setOpenConfigurator } from "context";
 import brandWhite from "assets/images/logo-ct.png";
 import brandDark from "assets/images/logo-ct-dark.png";
+import AgenieChatbot from "./components/AgenieChatbot"; // Adjust the path if needed
+
+
 
 export default function App() {
+  console.log("Rendering App.js");
   const [controller, dispatch] = useMaterialUIController();
-  const { miniSidenav, direction, layout, openConfigurator, sidenavColor, transparentSidenav, whiteSidenav, darkMode } = controller;
+  const {
+    miniSidenav,
+    direction,
+    layout,
+    openConfigurator,
+    sidenavColor,
+    transparentSidenav,
+    whiteSidenav,
+    darkMode,
+  } = controller;
   const [onMouseEnter, setOnMouseEnter] = useState(false);
   const [rtlCache, setRtlCache] = useState(null);
   const { pathname } = useLocation();
@@ -28,7 +41,7 @@ export default function App() {
   // Check if user is authenticated
   const token = localStorage.getItem("token");
   const isAuthenticated = !!token;
-  
+
   // Logging token detection for debugging
   console.log("Is authenticated:", isAuthenticated);
 
@@ -122,9 +135,21 @@ export default function App() {
         <Routes>
           {getRoutes(routes)}
           {/* Force login page as default if not authenticated */}
-          <Route path="/" element={isAuthenticated ? <Navigate to="/dashboard" /> : <Navigate to="/authentication/sign-in" />} />
-          <Route path="*" element={isAuthenticated ? <Navigate to="/dashboard" /> : <Navigate to="/authentication/sign-in" />} />
+          <Route
+            path="/"
+            element={
+              isAuthenticated ? <Navigate to="/dashboard" /> : <Navigate to="/authentication/sign-in" />
+            }
+          />
+          <Route
+            path="*"
+            element={
+              isAuthenticated ? <Navigate to="/dashboard" /> : <Navigate to="/authentication/sign-in" />
+            }
+          />
         </Routes>
+        {/* Add Chatbot */}
+        <AgenieChatbot />
       </ThemeProvider>
     </CacheProvider>
   ) : (
@@ -148,9 +173,21 @@ export default function App() {
       <Routes>
         {getRoutes(routes)}
         {/* Force login page as default if not authenticated */}
-        <Route path="/" element={isAuthenticated ? <Navigate to="/dashboard" /> : <Navigate to="/authentication/sign-in" />} />
-        <Route path="*" element={isAuthenticated ? <Navigate to="/dashboard" /> : <Navigate to="/authentication/sign-in" />} />
+        <Route
+          path="/"
+          element={
+            isAuthenticated ? <Navigate to="/dashboard" /> : <Navigate to="/authentication/sign-in" />
+          }
+        />
+        <Route
+          path="*"
+          element={
+            isAuthenticated ? <Navigate to="/dashboard" /> : <Navigate to="/authentication/sign-in" />
+          }
+        />
       </Routes>
+      {/* Add Chatbot */}
+      <AgenieChatbot />
     </ThemeProvider>
   );
 }
